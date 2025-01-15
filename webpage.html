@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop and Fertilizer Recommendation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            position: relative;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            background-color: #fff;
+        }
+        h2 {
+            font-size: 39px; /* Increased by 3px */
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-section {
+            text-align: center;
+        }
+        .form-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            flex: 1;
+            margin-right: 10px;
+        }
+        .form-group input {
+            flex: 0.8; /* Decreased width of input fields */
+            padding: 8px; /* Added some padding for better look */
+        }
+        .form-group span.range {
+            flex: 1;
+            text-align: right;
+            color: #666;
+            margin-left: -200px; /* Moved ranges 200px to the left */
+        }
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .input-heading {
+            text-align: left; /* Aligned to the left */
+            font-weight: bold;
+            margin-bottom: 20px;
+            margin-left: 180px; /* Moved slightly to the right (160px) */
+            font-size: 22px; /* Increased by 2px */
+        }
+        .range-heading {
+            text-align: right; /* Aligned to the right */
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 22px; /* Increased by 2px */
+        }
+        .result {
+            margin-top: 20px;
+        }
+        /* Positioning the images at the corners */
+        .image-corner {
+            position: absolute;
+            width: 300px;
+            height: 250px;
+            z-index: 1;
+        }
+        .image-top-left {
+            top: 0;
+            left: 0;
+        }
+        .image-top-right {
+            top: 0;
+            right: 0;
+        }
+        .image-bottom-left {
+            bottom: 100px; /* Moved upwards */
+            left: 0;
+        }
+        .image-bottom-right {
+            bottom: 100px; /* Moved upwards */
+            right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crop and Fertilizer Recommendation System</h2>
+
+        <!-- Form Content -->
+        <div class="form-section">
+            <div class="form-group">
+                <div class="input-heading">
+                    <span>INPUTS</span> <!-- Aligned left -->
+                </div>
+                <div class="range-heading">
+                    <span>RANGES</span> <!-- Aligned right -->
+                </div>
+            </div>
+            
+            <form id="cropForm">
+                <div class="form-group">
+                    <label for="nitrogen">Nitrogen (N):</label>
+                    <input type="number" id="nitrogen" name="nitrogen" required>
+                    <span class="range">0.0 to 149.0</span>
+                </div>
+                <span class="error" id="error-nitrogen"></span>
+
+                <div class="form-group">
+                    <label for="phosphorus">Phosphorus (P):</label>
+                    <input type="number" id="phosphorus" name="phosphorus" required>
+                    <span class="range">4.0 to 150.0</span>
+                </div>
+                <span class="error" id="error-phosphorus"></span>
+
+                <div class="form-group">
+                    <label for="potassium">Potassium (K):</label>
+                    <input type="number" id="potassium" name="potassium" required>
+                    <span class="range">5.0 to 206.0</span>
+                </div>
+                <span class="error" id="error-potassium"></span>
+
+                <div class="form-group">
+                    <label for="temperature">Temperature (°C):</label>
+                    <input type="number" id="temperature" name="temperature" required>
+                    <span class="range">8.83°C to 46.73°C</span>
+                </div>
+                <span class="error" id="error-temperature"></span>
+
+                <div class="form-group">
+                    <label for="humidity">Humidity (%):</label>
+                    <input type="number" id="humidity" name="humidity" required>
+                    <span class="range">14.26% to 104.98%</span>
+                </div>
+                <span class="error" id="error-humidity"></span>
+
+                <div class="form-group">
+                    <label for="ph">pH:</label>
+                    <input type="number" step="0.01" id="ph" name="ph" required>
+                    <span class="range">3.50 to 10.23</span>
+                </div>
+                <span class="error" id="error-ph"></span>
+
+                <div class="form-group">
+                    <label for="rainfall">Rainfall (mm):</label>
+                    <input type="number" id="rainfall" name="rainfall" required>
+                    <span class="range">20.21 mm to 298.56 mm</span>
+                </div>
+                <span class="error" id="error-rainfall"></span>
+
+                <button type="submit">Recommend Crops</button>
+            </form>
+        </div>
+
+        <div class="result" id="result"></div>
+    </div>
+
+    <!-- Positioned Images -->
+    <img src="https://media.dev.to/dynamic/image/width=800%2Cheight=%2Cfit=scale-down%2Cgravity=auto%2Cformat=auto/https%3A%2F%2Fdev-to-uploads.s3.amazonaws.com%2Fuploads%2Farticles%2Foz0c1gb7set3hxphwrcr.PNG" alt="Image 1" class="image-corner image-top-left">
+    <img src="https://www.homebiogas.com/wp-content/uploads/2023/09/shutterstock_1789648031-1024x683.jpg.webp" alt="Image 2" class="image-corner image-top-right">
+    <img src="https://www.shutterstock.com/shutterstock/photos/1721507938/display_1500/stock-photo-agricultural-engineers-working-in-field-1721507938.jpg" alt="Image 3" class="image-corner image-bottom-left">
+    <img src="https://img.freepik.com/premium-photo/plants-growing-soil-with-concept-plant-fertilizers-plant-nutrients-necessary-factors-plant-growth-development-process_104677-1438.jpg?w=1060" alt="Image 4" class="image-corner image-bottom-right">
+
+    <script>
+        document.getElementById('cropForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Clear previous error messages
+            document.querySelectorAll('.error').forEach(el => el.innerHTML = '');
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => (data[key] = parseFloat(value)));
+
+            // Input range validation
+            let isValid = true;
+
+            // Nitrogen (N)
+            if (data.nitrogen < 0.0 || data.nitrogen > 149.0) {
+                document.getElementById('error-nitrogen').innerText = 'Nitrogen must be between 0.0 and 149.0';
+                isValid = false;
+            }
+
+            // Phosphorus (P)
+            if (data.phosphorus < 4.0 || data.phosphorus > 150.0) {
+                document.getElementById('error-phosphorus').innerText = 'Phosphorus must be between 4.0 and 150.0';
+                isValid = false;
+            }
+
+            // Potassium (K)
+            if (data.potassium < 5.0 || data.potassium > 206.0) {
+                document.getElementById('error-potassium').innerText = 'Potassium must be between 5.0 and 206.0';
+                isValid = false;
+            }
+
+            // Temperature (°C)
+            if (data.temperature < 8.83 || data.temperature > 46.73) {
+                document.getElementById('error-temperature').innerText = 'Temperature must be between 8.83°C and 46.73°C';
+                isValid = false;
+            }
+
+            // Humidity (%)
+            if (data.humidity < 14.26 || data.humidity > 104.98) {
+                document.getElementById('error-humidity').innerText = 'Humidity must be between 14.26% and 104.98%';
+                isValid = false;
+            }
+
+            // pH
+            if (data.ph < 3.50 || data.ph > 10.23) {
+                document.getElementById('error-ph').innerText = 'pH must be between 3.50 and 10.23';
+                isValid = false;
+            }
+
+            // Rainfall (mm)
+            if (data.rainfall < 20.21 || data.rainfall > 298.56) {
+                document.getElementById('error-rainfall').innerText = 'Rainfall must be between 20.21 mm and 298.56 mm';
+                isValid = false;
+            }
+
+            // If all inputs are valid, show the result
+            if (isValid) {
+                document.getElementById('result').innerText = 'Crops Recommended based on the provided data!';
+            }
+        });
+    </script>
+</body>
+</html>
